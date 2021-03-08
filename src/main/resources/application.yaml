@@ -1,16 +1,18 @@
 spring:
   datasource:
-    url: 'jdbc:h2:file:./target/database/h2'
+    url: 'jdbc:postgresql://localhost:5432/hapi_dstu3'
+    #url: 'jdbc:h2:file:./target/database/h2'
     #url: jdbc:h2:mem:test_mem
     username: sa
     password: null
-    driverClassName: org.h2.Driver
+    driverClassName: org.postgresql.Driver
+    #driverClassName: org.h2.Driver
     max-active: 15
   jpa:
     properties:
       hibernate.format_sql: false
       hibernate.show_sql: false
-#      hibernate.dialect: org.hibernate.dialect.h2dialect
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
 #      hibernate.hbm2ddl.auto: update
 #      hibernate.jdbc.batch_size: 20
 #      hibernate.cache.use_query_cache: false

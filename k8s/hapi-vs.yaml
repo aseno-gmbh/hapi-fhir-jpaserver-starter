@@ -1,0 +1,18 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: hapi-vserver
+spec:
+  hosts:
+  - hapi.cloud-doc.org
+  gateways:
+  - hapi-gateway
+  http:
+  - match:
+    - port: 80
+    route:
+    - destination:
+        host: hapiapp
+        port:
+          number: 8080

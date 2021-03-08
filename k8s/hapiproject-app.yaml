@@ -1,0 +1,53 @@
+##################################################################################################
+# hapiapp server service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: hapiapp
+  labels:
+    app: hapiapp
+    service: hapiapp
+spec:
+  ports:
+  - port: 8080
+    name: http
+  selector:
+    app: hapiapp
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hapiapp-sa
+  labels:
+          account: hapiapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hapiapp-v1
+  labels:
+    app: hapiapp
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hapiapp
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: hapiapp
+        version: v1
+    spec:
+      serviceAccountName: hapiapp-sa
+      containers:
+      - name: hapiapp
+        image: hapiproject/hapi:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          #securityContext:
+          #runAsUser: 1000
+---

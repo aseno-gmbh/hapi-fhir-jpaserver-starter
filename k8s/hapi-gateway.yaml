@@ -1,0 +1,23 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: hapi-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "hapi.cloud-doc.org"
+    - "test.cloud-doc.org"
+      #- port:
+      #number: 8080
+      #name: http-wc
+      #protocol: HTTP
+      #hosts:
+      #- "*"
+---
