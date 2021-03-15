@@ -1,5 +1,6 @@
-
 #!/bin/bash
+
+echo "------------- starting ASENO HAPI CONTAINER -----------"
 echo $APP_PORT
 echo $DB_URL
 echo $DB_USER
