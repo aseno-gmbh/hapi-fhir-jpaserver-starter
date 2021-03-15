@@ -40,6 +40,16 @@ You can customize HAPI directly from the `run` command using environment variabl
 docker run -p 8080:8080 -e hapi.fhir.default_encoding=xml hapiproject/hapi:latest
 ```
 
+### ASENO specific adjustments
+echo $APP_PORT
+echo $DB_URL
+echo $DB_USER
+echo $JAVA_OPTS
+
+```
+docker run -p 8080:8080 -e hapi.fhir.default_encoding=xml -e APP_PORT=8080 -e DB_URL=hapi-postgresql.datalake.svc.cluster.local -e DB_PWD=XXX hapiproject/hapi:latest
+```
+
 HAPI looks in the environment variables for properties in the [application.yaml](https://github.com/hapifhir/hapi-fhir-jpaserver-starter/blob/master/src/main/resources/application.yaml) file for defaults.
 
 ### Configuration via overridden application.yaml file and using Docker
