@@ -45,11 +45,20 @@ spec:
       serviceAccountName: hapiapp-sa
       containers:
       - name: hapiapp
-        image: hapiproject/hapi:latest 
+        image: valentin99/hapi-fhir-jpaserver-starter:1.0.0 
         imagePullPolicy: IfNotPresent
+        env:
+          - name: APP_PORT
+            value: "8080"
+          - name: DB_URL
+            value: "jdbc:postgresql://hapi-postgresql.datalake.svc.cluster.local:5432/postgres"
+          - name: DB_USER
+            value: "postgres"
+          - name: DB_PWD
+            value: "gU48VdGm2n"
         ports:
-        - containerPort: 8080
-          #securityContext:
-          #runAsUser: 1000
+          - containerPort: 8080
+        securityContext:
+          runAsUser: 1000
 ---
 
