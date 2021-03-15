@@ -20,7 +20,8 @@ kind: ServiceAccount
 metadata:
   name: hapiapp-sa
   labels:
-          account: hapiapp
+     account: hapiapp
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -44,10 +45,11 @@ spec:
       serviceAccountName: hapiapp-sa
       containers:
       - name: hapiapp
-        image: hapiproject/hapi:latest
+        image: hapiproject/hapi:latest 
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
           #securityContext:
           #runAsUser: 1000
 ---
+

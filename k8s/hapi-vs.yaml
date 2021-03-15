@@ -13,6 +13,6 @@ spec:
     - port: 80
     route:
     - destination:
-        host: hapiapp
+        host: hapiapp 
         port:
           number: 8080
