@@ -11,8 +11,8 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "hapi.cloud-doc.org"
-    - "test.cloud-doc.org"
+    - "hapi.vinayak-tech.de"
+    - "funny-erp.vinayak-tech.de"
       #- port:
       #number: 8080
       #name: http-wc

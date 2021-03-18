@@ -2,10 +2,10 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: hapi-vserver
+  name: erpnext-vserver
 spec:
   hosts:
-  - hapi.vinayak-tech.de
+  - funny-erp.vinayak-tech.de
   gateways:
   - hapi-gateway
   http:
@@ -13,6 +13,6 @@ spec:
     - port: 80
     route:
     - destination:
-        host: hapiapp 
+        host: frappe-bench-001-erpnext.erpnext.svc.cluster.local 
         port:
-          number: 8080
+          number: 80
