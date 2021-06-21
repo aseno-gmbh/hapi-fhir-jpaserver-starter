@@ -45,13 +45,13 @@ spec:
       serviceAccountName: hapiapp-sa
       containers:
       - name: hapiapp
-        image: aseno/hapi-fhir:1.0.0 
+        image: CONTAINER_IMAGE # aseno/hapi-fhir:1.0.0 
         imagePullPolicy: IfNotPresent
         env:
           - name: APP_PORT
             value: "8080"
           - name: DB_URL
-            value: "jdbc:postgresql://hapi-postgresql.datalake.svc.cluster.local:5432/postgres"
+            value: TODO #"jdbc:postgresql://hapi-postgresql.datalake.svc.cluster.local:5432/postgres"
           - name: DB_USER
             value: "postgres"
           - name: DB_PWD
