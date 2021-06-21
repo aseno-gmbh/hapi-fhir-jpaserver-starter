@@ -1,4 +1,4 @@
-FROM 343294690266.dkr.ecr.eu-central-1.amazonaws.com/aseno-base-jdk:11-jre-slim as build-hapi
+FROM 343294690266.dkr.ecr.eu-central-1.amazonaws.com/aseno-base-mvn:3.6.3-jdk-11-slim as build-hapi
 WORKDIR /tmp/hapi-fhir-jpaserver-starter
 
 COPY pom.xml .
