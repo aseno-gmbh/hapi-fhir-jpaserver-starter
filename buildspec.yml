@@ -17,8 +17,8 @@ phases:
   build:
     commands:
       - echo Build started on `date`
-      - echo mvn clean package...
-      - mvn clean package 
+      - echo mvn clean package -DskipTests...
+      - mvn clean package -DskipTests
       - echo Building the Docker image...  
       - docker build --tag $REPOSITORY_URI:$TAG .
 
