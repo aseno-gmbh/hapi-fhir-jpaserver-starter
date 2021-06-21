@@ -214,7 +214,7 @@ Resources:
             Value: !Ref GitSourceRepo
           - Name: REPOSITORY_BRANCH
             Value: !Ref GitBranch
-          - Nmae: ENVIRONMENT_NAME
+          - Name: ENVIRONMENT_NAME
             Value: !Ref PipeEnv 
           - Name: EKS_CLUSTER_NAME
             Value: !Ref EksClusterName
