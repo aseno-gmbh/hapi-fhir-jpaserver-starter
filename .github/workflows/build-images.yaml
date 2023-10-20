@@ -2,8 +2,7 @@ name: Build Container Images
 
 on:
   push:
-    tags:
-      - "image/v*"
+    branches: [master]
     paths-ignore:
       - "charts/**"
   pull_request:
