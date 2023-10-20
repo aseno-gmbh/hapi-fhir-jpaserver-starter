@@ -1,18 +1,27 @@
 {
   "version": "1",
-  "mdmTypes": ["Patient", "Practitioner"],
+  "mdmTypes": [
+    "Patient",
+    "Practitioner"
+  ],
   "candidateSearchParams": [
     {
       "resourceType": "Patient",
-      "searchParams": ["birthdate"]
+      "searchParams": [
+        "birthdate"
+      ]
     },
     {
       "resourceType": "*",
-      "searchParams": ["identifier"]
+      "searchParams": [
+        "identifier"
+      ]
     },
     {
       "resourceType": "Patient",
-      "searchParams": ["general-practitioner"]
+      "searchParams": [
+        "general-practitioner"
+      ]
     }
   ],
   "candidateFilterSearchParams": [
@@ -41,8 +50,8 @@
     }
   ],
   "matchResultMap": {
-    "cosine-given-name" : "POSSIBLE_MATCH",
-    "cosine-given-name,jaro-last-name" : "MATCH"
+    "cosine-given-name": "POSSIBLE_MATCH",
+    "cosine-given-name,jaro-last-name": "MATCH"
   },
-  "eidSystem": "http://company.io/fhir/NamingSystem/custom-eid-system"
+  "eidSystem": "https://cloud-doctor.eu/fhir/NamingSystem/cdp-eid-system"
 }
