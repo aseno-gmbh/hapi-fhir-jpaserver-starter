@@ -227,7 +227,7 @@ hapi:
 #  schema_management_strategy: CREATE
 #  username: SomeUsername
 keycloak:
-  auth-server-url: http://keycloak-backend
+  auth-server-url: http://keycloak-backend.keycloak
   realm: cloud-doctor
   resource: fhir-server
   credentials:
