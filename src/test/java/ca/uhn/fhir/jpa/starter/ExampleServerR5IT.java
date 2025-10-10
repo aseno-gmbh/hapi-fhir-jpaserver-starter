@@ -1,9 +1,5 @@
 package ca.uhn.fhir.jpa.starter;
 
-import static ca.uhn.fhir.util.TestUtil.waitForSize;
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.CacheControlDirective;
 import ca.uhn.fhir.rest.api.EncodingEnum;
@@ -11,33 +7,34 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
-import java.net.URI;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Enumerations;
-import org.hl7.fhir.r5.model.Observation;
-import org.hl7.fhir.r5.model.Patient;
-import org.hl7.fhir.r5.model.Subscription;
-import org.hl7.fhir.r5.model.SubscriptionTopic;
+import org.hl7.fhir.r5.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.net.URI;
+
+import static ca.uhn.fhir.util.TestUtil.waitForSize;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {Application.class, JpaStarterWebsocketDispatcherConfig.class}, properties =
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {Application.class}, properties =
   {
      "spring.datasource.url=jdbc:h2:mem:dbr5",
+	  "spring.jpa.properties.hibernate.search.backend.directory.type=local-heap",
      "hapi.fhir.fhir_version=r5",
 	  "hapi.fhir.cr_enabled=false",
-	  "hapi.fhir.subscription.websocket_enabled=true"
+	  "hapi.fhir.subscription.websocket_enabled=true",
+	  "hapi.fhir.remote_terminology_service.snomed.system=http://snomed.info/sct",
+	  "hapi.fhir.remote_terminology_service.snomed.url=https://tx.fhir.org/r5"
   })
 public class ExampleServerR5IT {
 
@@ -128,18 +125,16 @@ public class ExampleServerR5IT {
      * Attach websocket
      */
 
-    WebSocketClient myWebSocketClient = new WebSocketClient();
-    SocketImplementation mySocketImplementation = new SocketImplementation(mySubscriptionId.getIdPart(), EncodingEnum.JSON);
+	  SocketImplementation mySocketImplementation = new SocketImplementation(mySubscriptionId.getIdPart(),
+		  EncodingEnum.JSON);
 
-    myWebSocketClient.start();
+	  URI echoUri = new URI(endpoint);
 
-	 URI echoUri = new URI(endpoint);
-	 ClientUpgradeRequest request = new ClientUpgradeRequest();
-    ourLog.info("Connecting to : {}", echoUri);
-    Future<Session> connection = myWebSocketClient.connect(mySocketImplementation, echoUri, request);
-    Session session = connection.get(2, TimeUnit.SECONDS);
+	  WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 
-    ourLog.info("Connected to WS: {}", session.isOpen());
+	  ourLog.info("Connecting to : {}", echoUri);
+	  Session session = container.connectToServer(mySocketImplementation, echoUri);
+	  ourLog.info("Connected to WS: {}", session.isOpen());
 
     /*
      * Create a matching resource
@@ -158,6 +153,22 @@ public class ExampleServerR5IT {
      */
     ourClient.delete().resourceById(mySubscriptionId).execute();
   }
+
+
+	@Test
+	void testValidateRemoteTerminology() {
+
+		String testCodeSystem = "http://foo/cs";
+		String testValueSet = "http://foo/vs";
+		ourClient.create().resource(new CodeSystem().setUrl(testCodeSystem).addConcept(new CodeSystem.ConceptDefinitionComponent().setCode("yes")).addConcept(new CodeSystem.ConceptDefinitionComponent().setCode("no"))).execute();
+		ourClient.create().resource(new ValueSet().setUrl(testValueSet).setCompose(new ValueSet.ValueSetComposeComponent().addInclude(new ValueSet.ConceptSetComponent().setSystem(testValueSet)))).execute();
+
+		Parameters remoteResult = ourClient.operation().onType(ValueSet.class).named("$validate-code").withParameter(Parameters.class, "code", new StringType("22298006")).andParameter("system", new UriType("http://snomed.info/sct")).execute();
+		assertEquals(true, ((BooleanType) remoteResult.getParameterValue("result")).getValue());
+		assertEquals("Myocardial infarction", ((StringType) remoteResult.getParameterValue("display")).getValue());
+
+		Parameters localResult = ourClient.operation().onType(CodeSystem.class).named("$validate-code").withParameter(Parameters.class, "url", new UrlType(testCodeSystem)).andParameter("coding", new Coding(testCodeSystem, "yes", null)).execute();
+	}
 
   @BeforeEach
   void beforeEach() {

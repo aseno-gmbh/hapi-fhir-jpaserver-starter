@@ -1,21 +1,24 @@
 package ca.uhn.fhir.jpa.starter.ig;
 
 import ca.uhn.fhir.jpa.packages.IPackageInstallerSvc;
+import ca.uhn.fhir.jpa.packages.PackageInstallationSpec;
 import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OperationParam;
 import org.hl7.fhir.r5.model.Base64BinaryType;
 import org.hl7.fhir.r5.model.Parameters;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-@Conditional({OnR5Condition.class, IgConfigCondition.class})
+@Conditional({OnR5Condition.class})
+@ConditionalOnProperty(name = "hapi.fhir.ig_runtime_upload_enabled", havingValue = "true")
 @Service
-public class ImplementationGuideR5OperationProvider {
+public class ImplementationGuideR5OperationProvider implements IImplementationGuideOperationProvider {
 
-	IPackageInstallerSvc packageInstallerSvc;
+	final IPackageInstallerSvc packageInstallerSvc;
 
 	public ImplementationGuideR5OperationProvider(IPackageInstallerSvc packageInstallerSvc) {
 		this.packageInstallerSvc = packageInstallerSvc;
@@ -31,6 +34,16 @@ public class ImplementationGuideR5OperationProvider {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		return new Parameters();
+	}
+
+	@Operation(name = "$uninstall", typeName = "ImplementationGuide")
+	public Parameters uninstall(
+			@OperationParam(name = "name", min = 1, max = 1) String name,
+			@OperationParam(name = "version", min = 1, max = 1) String version) {
+
+		packageInstallerSvc.uninstall(
+				new PackageInstallationSpec().setName(name).setVersion(version));
 		return new Parameters();
 	}
 }
