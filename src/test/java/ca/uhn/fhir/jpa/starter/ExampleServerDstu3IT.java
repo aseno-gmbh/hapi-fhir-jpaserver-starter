@@ -1,7 +1,6 @@
 package ca.uhn.fhir.jpa.starter;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.cr.config.RepositoryConfig;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.CacheControlDirective;
@@ -10,20 +9,20 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.client.ClientUpgradeRequest;
-import org.eclipse.jetty.websocket.client.WebSocketClient;
 import org.hl7.fhir.dstu3.model.*;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.opencds.cqf.fhir.cr.hapi.config.RepositoryConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.File;
@@ -31,8 +30,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import static ca.uhn.fhir.util.TestUtil.waitForSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,21 +37,21 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = {
-    Application.class,
-    JpaStarterWebsocketDispatcherConfig.class,
-    RepositoryConfig.class
-}, properties = {
-    "spring.profiles.include=storageSettingsTest",
-    "spring.datasource.url=jdbc:h2:mem:dbr3",
-    "hapi.fhir.fhir_version=dstu3",
-    "hapi.fhir.cr_enabled=true",
-    "hapi.fhir.subscription.websocket_enabled=true",
-    "hapi.fhir.allow_external_references=true",
-    "hapi.fhir.allow_placeholder_references=true",
-    "spring.main.allow-bean-definition-overriding=true"
-})
-
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+	classes = {
+		Application.class,
+		RepositoryConfig.class
+	}, properties =
+  {
+     "spring.datasource.url=jdbc:h2:mem:dbr3",
+     "hapi.fhir.fhir_version=dstu3",
+	  "hapi.fhir.cr_enabled=true",
+     "hapi.fhir.subscription.websocket_enabled=true",
+     "hapi.fhir.allow_external_references=true",
+     "hapi.fhir.allow_placeholder_references=true",
+	  "spring.main.allow-bean-definition-overriding=true",
+	  "spring.jpa.properties.hibernate.search.backend.directory.type=local-heap"
+  })
 class ExampleServerDstu3IT implements IServerSupport {
 
   private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(ExampleServerDstu3IT.class);
@@ -158,6 +155,7 @@ class ExampleServerDstu3IT implements IServerSupport {
     return count;
   }
 
+<<<<<<< HEAD
   private Bundle loadBundle(String theLocation, FhirContext theCtx, IGenericClient theClient) throws IOException {
     String json = stringFromResource(theLocation);
     Bundle bundle = (Bundle) theCtx.newJsonParser().parseResource(json);
@@ -175,6 +173,17 @@ class ExampleServerDstu3IT implements IServerSupport {
   // determined by the monitor)");
   // subscription.setStatus(Subscription.SubscriptionStatus.REQUESTED);
   // subscription.setCriteria("Observation?status=final");
+=======
+  @Test
+  void testWebsocketSubscription() throws Exception {
+    /*
+     * Create subscription
+     */
+    Subscription subscription = new Subscription();
+    subscription.setReason("Monitor new neonatal function (note, age will be determined by the monitor)");
+    subscription.setStatus(Subscription.SubscriptionStatus.REQUESTED);
+    subscription.setCriteria("Observation?status=final");
+>>>>>>> master
 
   // Subscription.SubscriptionChannelComponent channel = new
   // Subscription.SubscriptionChannelComponent();
@@ -195,6 +204,7 @@ class ExampleServerDstu3IT implements IServerSupport {
   // * Attach websocket
   // */
 
+<<<<<<< HEAD
   // WebSocketClient myWebSocketClient = new WebSocketClient();
   // SocketImplementation mySocketImplementation = new
   // SocketImplementation(mySubscriptionId.getIdPart(), EncodingEnum.JSON);
@@ -208,6 +218,18 @@ class ExampleServerDstu3IT implements IServerSupport {
   // Session session = connection.get(2, TimeUnit.SECONDS);
 
   // ourLog.info("Connected to WS: {}", session.isOpen());
+=======
+	  SocketImplementation mySocketImplementation = new SocketImplementation(mySubscriptionId.getIdPart(),
+		  EncodingEnum.JSON);
+
+	  URI echoUri = new URI("ws://localhost:" + port + "/websocket");
+
+	  WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+
+	  ourLog.info("Connecting to : {}", echoUri);
+	  Session session = container.connectToServer(mySocketImplementation, echoUri);
+	  ourLog.info("Connected to WS: {}", session.isOpen());
+>>>>>>> master
 
   // /*
   // * Create a matching resource
